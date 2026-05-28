@@ -1,0 +1,451 @@
+/* =========================================
+   🎛️ VARIABLES DYNAMIQUES (Jour / Nuit)
+   ========================================= */
+:root {
+  /* THEME SOMBRE (Par défaut) */
+  --bg-base: #0f1115;
+  --bg-surface: #181a20;
+  --bg-surface-elevated: rgba(30, 33, 40, 0.7);
+  --bg-glass: rgba(24, 26, 32, 0.6);
+  
+  --border-dim: rgba(255, 255, 255, 0.05);
+  --border-light: rgba(255, 255, 255, 0.1);
+  --border-active: rgba(99, 102, 241, 0.5); /* Violet moderne */
+  
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-tertiary: #64748b;
+  
+  --accent-primary: #6366f1; /* Indigo */
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+  --accent-spotify: #1ed760;
+  --accent-deezer: #ff0043;
+
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 25px -3px rgba(0, 0, 0, 0.5);
+  
+  /* Espacements et Formes */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1.25rem;
+  --space-lg: 2rem;
+  --space-xl: 3.5rem;
+  
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 99px;
+  
+  --ease-out: 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  --font-sans: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* THEME CLAIR */
+[data-theme="light"] {
+  --bg-base: #f1f5f9;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  
+  --border-dim: rgba(0, 0, 0, 0.05);
+  --border-light: rgba(0, 0, 0, 0.1);
+  --border-active: rgba(99, 102, 241, 0.6);
+  
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  
+  --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+}
+
+/* =========================================
+   🔄 RESET & BASE
+   ========================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  transition: background-color var(--ease-out), color var(--ease-out);
+  overflow-x: hidden;
+}
+
+/* =========================================
+   📐 HEADER & THEME TOGGLE
+   ========================================= */
+.app-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-xl);
+}
+
+.header-content h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.2rem;
+}
+
+.header-content .subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.theme-toggle {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-pill);
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--ease-out);
+  overflow: hidden;
+  position: relative;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-primary);
+}
+
+/* Animation des icônes du thème */
+.icon-sun, .icon-moon { position: absolute; transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease; }
+[data-theme="dark"] .icon-sun { transform: translateY(30px) rotate(90deg); opacity: 0; }
+[data-theme="dark"] .icon-moon { transform: translateY(0) rotate(0); opacity: 1; }
+[data-theme="light"] .icon-moon { transform: translateY(-30px) rotate(-90deg); opacity: 0; }
+[data-theme="light"] .icon-sun { transform: translateY(0) rotate(0); opacity: 1; }
+
+/* =========================================
+   🎛️ FILTRES & CARDS
+   ========================================= */
+.filters-container { display: flex; flex-direction: column; gap: var(--space-lg); margin-bottom: var(--space-xl); }
+
+h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-sm);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+h2::after { content: ""; flex: 1; height: 1px; background: var(--border-light); }
+
+.mood-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-sm);
+}
+
+.mood-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); /* Effet ressort */
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.mood-card:hover {
+  background: var(--bg-surface-elevated);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--border-light);
+}
+
+.mood-card.active {
+  background: var(--accent-gradient);
+  border-color: transparent;
+  color: #fff;
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+
+.mood-icon { font-size: 2rem; }
+.mood-name { font-weight: 600; font-size: 0.9rem; color: var(--text-secondary); transition: color var(--ease-out); }
+.mood-card:hover .mood-name { color: var(--text-primary); }
+.mood-card.active .mood-name { color: #fff; }
+
+/* =========================================
+   ⚙️ CONTRÔLES (BARRE FLOTTANTE)
+   ========================================= */
+.controls-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.5rem;
+  margin-bottom: var(--space-lg);
+  position: sticky;
+  top: 20px;
+  z-index: 100;
+  box-shadow: var(--shadow-lg);
+}
+
+.toggle-wrapper { display: flex; align-items: center; gap: 0.75rem; }
+.toggle-text { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+
+/* Switch moderne */
+.switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0;
+  background-color: var(--border-light);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: var(--ease-out);
+}
+.slider::before {
+  content: ""; position: absolute; height: 20px; width: 20px;
+  left: 3px; bottom: 3px;
+  background-color: var(--text-primary);
+  border-radius: 50%;
+  transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+input:checked + .slider { background: var(--accent-gradient); }
+input:checked + .slider::before { transform: translateX(22px); background-color: #fff; }
+
+/* Inputs et Selects */
+.duration-select {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 2rem 0.5rem 1rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  outline: none;
+  transition: var(--ease-out);
+}
+.duration-select:focus, .duration-select:hover { border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+
+/* Boutons globaux */
+.btn-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.5rem 1rem; border-radius: var(--radius-pill);
+  text-decoration: none; font-size: 0.85rem; font-weight: 600;
+  transition: all var(--ease-out); cursor: pointer; border: none;
+}
+.btn-spotify { background: var(--bg-surface); border: 1px solid var(--border-light); color: var(--text-primary); }
+.btn-spotify:hover { background: var(--accent-spotify); border-color: var(--accent-spotify); color: #000; transform: translateY(-2px); }
+.btn-deezer { background: var(--bg-surface); border: 1px solid var(--border-light); color: var(--text-primary); }
+.btn-deezer:hover { background: var(--accent-deezer); border-color: var(--accent-deezer); color: #fff; transform: translateY(-2px); }
+.btn-play { background: var(--text-primary); color: var(--bg-base); width: 38px; height: 38px; padding: 0; border-radius: 50%; font-size: 1rem; }
+.btn-play:hover { transform: scale(1.1); background: var(--accent-primary); color: white; }
+
+.results-info {
+  font-size: 0.8rem; font-family: var(--font-mono); font-weight: 700;
+  color: #fff; background: var(--accent-primary);
+  padding: 0.5rem 1rem; border-radius: var(--radius-pill);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* =========================================
+   🎵 TRACKLIST
+   ========================================= */
+.songs-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.song-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-dim);
+  border-radius: var(--radius-md);
+  padding: 1rem var(--space-md);
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-md);
+  transition: all var(--ease-out);
+  box-shadow: var(--shadow-sm);
+}
+
+.song-card:hover {
+  transform: translateX(5px);
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-lg);
+}
+
+.song-header { display: flex; flex-direction: column; }
+.song-title { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.song-artist { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.2rem; }
+
+.song-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag {
+  background: var(--bg-base); border: 1px solid var(--border-light);
+  padding: 0.3rem 0.8rem; border-radius: var(--radius-pill);
+  font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.song-links { display: flex; gap: 0.5rem; align-items: center; justify-content: flex-end; }
+
+/* =========================================
+   📚 BIBLIOTHÈQUE & MODALE
+   ========================================= */
+.library-section {
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--border-light);
+}
+.saved-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-md); }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-content {
+  background: var(--bg-surface); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); padding: var(--space-xl); max-width: 500px; width: 90%;
+  box-shadow: var(--shadow-lg); text-align: left;
+}
+.modal-content h3 { font-size: 1.5rem; color: var(--text-primary); margin-bottom: 1rem; }
+.modal-content p { color: var(--text-secondary); margin-bottom: 1.5rem; }
+.modal-steps { background: var(--bg-base); padding: 1.5rem 1.5rem 1.5rem 2.5rem; border-radius: var(--radius-md); margin-bottom: 1.5rem; color: var(--text-primary); font-size: 0.95rem; }
+.modal-steps li { margin-bottom: 0.5rem; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 1rem; }
+
+/* =========================================
+   🌫️ EMPTY STATE
+   ========================================= */
+.empty-state {
+  text-align: center; padding: var(--space-xl) var(--space-md);
+  color: var(--text-tertiary); font-size: 1rem; font-weight: 500;
+  background: var(--bg-surface); border: 2px dashed var(--border-light);
+  border-radius: var(--radius-lg); margin-top: 1rem;
+}
+
+/* =========================================
+   📱 RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+  .app-header { flex-direction: column; gap: 1rem; align-items: center; text-align: center; }
+  .controls-container { flex-direction: column; align-items: stretch; }
+  .save-wrapper { flex-direction: column; width: 100%; }
+  .save-wrapper input, .save-wrapper button { width: 100%; justify-content: center; }
+  .results-info { align-self: center; }
+  .song-card { grid-template-columns: 1fr; gap: 1rem; text-align: center; padding: 1.5rem; }
+  .song-links { justify-content: center; }
+  .song-tags { justify-content: center; }
+}
+
+/* =========================================
+   ✏️ ÉDITION DE PLAYLIST (CRUD)
+   ========================================= */
+.edit-track-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--bg-base);
+}
+
+.edit-track-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-dim);
+  transition: background-color var(--ease-out);
+}
+
+.edit-track-item:hover {
+  background-color: var(--bg-surface);
+}
+
+.edit-track-item:last-child {
+  border-bottom: none;
+}
+
+.edit-track-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-right: 1rem;
+}
+
+.edit-track-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.edit-track-artist {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.1rem;
+}
+
+.btn-remove-track {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.4rem;
+  border-radius: 50%;
+  transition: all var(--ease-out);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-remove-track:hover {
+  color: var(--accent-deezer);
+  background: rgba(255, 0, 67, 0.1);
+  transform: scale(1.1);
+}
+
+/* On personnalise un peu la scrollbar pour que ce soit clean */
+.edit-track-list::-webkit-scrollbar {
+  width: 6px;
+}
+.edit-track-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.edit-track-list::-webkit-scrollbar-thumb {
+  background-color: var(--border-active);
+  border-radius: var(--radius-pill);
+}

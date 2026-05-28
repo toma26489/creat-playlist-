@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 Audio Hub - Filter</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="header-content">
+        <h1>Audio Hub Filter</h1>
+        <p class="subtitle">Croise tes émotions, ton activité et tes genres favoris.</p>
+      </div>
+      <button id="themeToggle" class="theme-toggle" aria-label="Changer de thème">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+      </button>
+    </header>
+
+    <div id="exportModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content">
+        <h3>📋 Liste copiée avec succès !</h3>
+        <p>Tes morceaux sont dans ton presse-papier. Pour les envoyer sur Deezer :</p>
+        <ol class="modal-steps">
+          <li>Ouvre <strong>TuneMyMusic</strong> via le bouton ci-dessous.</li>
+          <li>Clique sur <strong>Commencer</strong>.</li>
+          <li>Choisis la source <strong>Texte libre</strong> (l'icône TXT en bas).</li>
+          <li>Colle ton texte, puis choisis <strong>Deezer</strong> comme destination !</li>
+        </ol>
+        <div class="modal-actions">
+          <button id="closeModalBtn" class="btn-link" style="color: var(--text-secondary); border: 1px solid var(--border-light);">Fermer</button>
+          <a href="https://www.tunemymusic.com/fr/transfer" target="_blank" class="btn-link btn-deezer" style="text-decoration: none;">🚀 Ouvrir TuneMyMusic</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="editModal" class="modal-overlay" style="display: none;">
+      <div class="modal-content" style="max-width: 600px;">
+        <h3>✏️ Modifier la playlist</h3>
+        <div style="margin-bottom: var(--space-md);">
+          <label style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">Nom de la playlist</label>
+          <input type="text" id="editPlaylistName" class="duration-select" style="width: 100%; margin-top: 0.5rem; background-image: none; padding-right: 1rem;">
+        </div>
+        <label style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;">Morceaux (<span id="editTrackCount">0</span>)</label>
+        <div id="editTrackList" class="edit-track-list">
+          </div>
+        <div class="modal-actions" style="margin-top: var(--space-lg);">
+          <button id="closeEditModalBtn" class="btn-link" style="color: var(--text-secondary); border: 1px solid var(--border-light);">Annuler</button>
+          <button id="saveEditBtn" class="btn-link btn-spotify">💾 Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <div class="library-section" id="librarySection" style="display: none;">
+        <h2>📚 Ma Bibliothèque</h2>
+        <div id="savedPlaylistsGrid" class="saved-grid"></div>
+      </div>
+
+      <div class="filters-container">
+        <div class="category-section">
+          <h2>1. Émotions</h2>
+          <div class="mood-grid" id="emotionsGrid"></div>
+        </div>
+
+        <div class="category-section">
+          <h2>2. Activités</h2>
+          <div class="mood-grid" id="activitiesGrid"></div>
+        </div>
+
+        <div class="category-section">
+          <h2>3. Genres & Époques</h2>
+          <div class="mood-grid" id="genresGrid"></div>
+        </div>
+      </div>
+
+      <div class="controls-container">
+        <div class="toggle-wrapper">
+          <label class="switch">
+            <input type="checkbox" id="strictMode">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-text">Mode strict</span>
+        </div>
+
+        <div class="toggle-wrapper">
+          <span class="toggle-text">Durée :</span>
+          <select id="playlistDuration" class="duration-select">
+            <option value="0">Illimitée</option>
+            <option value="1800">30 min</option>
+            <option value="3600">1 heure</option>
+            <option value="7200">2 heures</option>
+            <option value="10800">3 heures</option>
+          </select>
+        </div>
+
+        <div class="save-wrapper" id="saveWrapper" style="display: none; gap: 0.5rem; align-items: center;">
+          <input type="text" id="playlistName" class="duration-select" placeholder="Nom du mix..." style="width: 140px; background-image: none; padding-right: 0.8rem;">
+          <button id="saveBtn" class="btn-link btn-spotify" style="padding: 0.4rem 1rem;">💾 Sauver</button>
+          
+          <button id="copyPlaylistBtn" class="btn-link btn-deezer" style="padding: 0.4rem 0.8rem;" title="Copier la liste pour TuneMyMusic / Deezer">📋 Copier le texte</button>
+        </div>
+
+        <div id="resultsInfo" class="results-info"></div>
+      </div>
+
+      <div id="songsContainer" class="songs-grid">
+        <div class="empty-state">Sélectionne des filtres pour affiner ta recherche.</div>
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
