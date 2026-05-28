@@ -203,7 +203,6 @@ function renderSavedPlaylists() {
   if (saved.length === 0) { librarySection.style.display = 'none'; return; }
 
   librarySection.style.display = 'block';
-  // AJOUT DU BOUTON D'ÉDITION ICI
   grid.innerHTML = saved.map(pl => `
     <div class="mood-card" style="align-items: flex-start; text-align: left; cursor: default;">
       <div style="font-weight: 700; font-size: 1rem; color: var(--text-primary); margin-bottom: 0.2rem;">${pl.name}</div>
@@ -234,7 +233,7 @@ function openEditModal(id) {
   if (!pl) return;
 
   currentEditId = id;
-  currentEditTracks = [...pl.tracks]; // On copie les pistes pour l'édition
+  currentEditTracks = [...pl.tracks];
 
   document.getElementById('editPlaylistName').value = pl.name;
   renderEditTracks();
@@ -282,7 +281,6 @@ function saveEditedPlaylist() {
     renderSavedPlaylists();
     document.getElementById('editModal').style.display = 'none';
     
-    // Si la playlist éditée est actuellement affichée, on la recharge visuellement
     const info = document.getElementById('resultsInfo');
     if(info.textContent.includes(saved[plIndex].name.toUpperCase())) {
          loadSavedPlaylist(currentEditId);
@@ -341,7 +339,8 @@ function copyPlaylistToClipboard() {
 async function renderSongs() {
   const container = document.getElementById('songsContainer');
   const info = document.getElementById('resultsInfo');
-  const strict = document.getElementById('strictMode').checked;
+  
+  // Plus de variable "strict" ici !
   const durationSelect = document.getElementById('playlistDuration');
   const targetDuration = parseInt(durationSelect ? durationSelect.value : 0, 10);
   const filters = Array.from(selectedFilters);
@@ -377,8 +376,9 @@ async function renderSongs() {
 
   let finalTracks = Array.from(trackMap.values());
 
-  if (strict) { finalTracks = finalTracks.filter(t => t.matchCount === filters.length); } 
-  else { finalTracks.sort((a, b) => b.matchCount - a.matchCount); finalTracks = finalTracks.slice(0, 300); }
+  // On trie simplement par nombre de correspondances pour afficher les meilleurs combos en premier
+  finalTracks.sort((a, b) => b.matchCount - a.matchCount); 
+  finalTracks = finalTracks.slice(0, 300);
 
   finalTracks = shuffleArray(finalTracks);
 
@@ -439,7 +439,6 @@ async function renderSongs() {
 document.addEventListener('DOMContentLoaded', () => {
   initGrids();
   initLibrary();
-  document.getElementById('strictMode').addEventListener('change', renderSongs);
   document.getElementById('playlistDuration').addEventListener('change', renderSongs);
   
   const themeToggleBtn = document.getElementById('themeToggle');
